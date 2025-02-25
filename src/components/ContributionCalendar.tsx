@@ -70,17 +70,17 @@ export function ContributionCalendar({ trackable }: ContributionCalendarProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-600">
             {completedCount} contributions in the last year
           </span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-600">
+        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
           <span>Less</span>
-          <div className="w-3 h-3 rounded-sm bg-gray-200" />
+          <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm bg-gray-200" />
           <div
-            className="w-3 h-3 rounded-sm"
+            className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm"
             style={{ backgroundColor: trackable.color }}
           />
           <span>More</span>
@@ -90,9 +90,9 @@ export function ContributionCalendar({ trackable }: ContributionCalendarProps) {
       <div className="overflow-x-auto">
         <div className="inline-block min-w-full">
           {/* Month labels */}
-          <div className="flex text-xs text-gray-500 mb-2 pl-8">
+          <div className="hidden sm:flex text-xs text-gray-500 mb-2 pl-6 sm:pl-8">
             {getMonthLabels().map((label, index) => (
-              <div key={index} className="w-11 text-center">
+              <div key={index} className="w-8 sm:w-11 text-center">
                 {label.month}
               </div>
             ))}
@@ -100,25 +100,25 @@ export function ContributionCalendar({ trackable }: ContributionCalendarProps) {
           
           {/* Calendar grid */}
           <div className="flex">
-            {/* Day labels */}
-            <div className="flex flex-col text-xs text-gray-500 mr-2">
-              <div className="h-3"></div>
-              <div className="h-3 flex items-center">Mon</div>
-              <div className="h-3"></div>
-              <div className="h-3 flex items-center">Wed</div>
-              <div className="h-3"></div>
-              <div className="h-3 flex items-center">Fri</div>
-              <div className="h-3"></div>
+            {/* Day labels - hidden on mobile */}
+            <div className="hidden sm:flex flex-col text-xs text-gray-500 mr-2">
+              <div className="h-2 sm:h-3"></div>
+              <div className="h-2 sm:h-3 flex items-center">Mon</div>
+              <div className="h-2 sm:h-3"></div>
+              <div className="h-2 sm:h-3 flex items-center">Wed</div>
+              <div className="h-2 sm:h-3"></div>
+              <div className="h-2 sm:h-3 flex items-center">Fri</div>
+              <div className="h-2 sm:h-3"></div>
             </div>
             
             {/* Grid */}
-            <div className="flex gap-1">
+            <div className="flex gap-0.5 sm:gap-1">
               {weeks.map((week, weekIndex) => (
-                <div key={weekIndex} className="flex flex-col gap-1">
+                <div key={weekIndex} className="flex flex-col gap-0.5 sm:gap-1">
                   {week.map((day, dayIndex) => (
                     <div
                       key={`${weekIndex}-${dayIndex}`}
-                      className="w-3 h-3 rounded-sm cursor-pointer hover:ring-1 hover:ring-gray-400 transition-all"
+                      className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm cursor-pointer hover:ring-1 hover:ring-gray-400 transition-all"
                       style={{ backgroundColor: getIntensityColor(day.hasEntry, trackable.color) }}
                       title={`${day.date}: ${day.hasEntry ? 'Completed' : 'Not completed'} ${trackable.name.toLowerCase()}`}
                     />

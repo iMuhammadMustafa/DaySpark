@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Flame, Calendar, TrendingUp } from 'lucide-react';
+import { Flame, Calendar, TrendingUp, Target } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { useEntries } from '@/hooks/useEntries';
 import { Trackable } from '@/hooks/useTrackables';
@@ -69,32 +69,29 @@ export function StreakDisplay({ trackable }: StreakDisplayProps) {
   const stats = calculateStats();
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <Card className="p-4 text-center">
-        <Flame className="w-6 h-6 mx-auto mb-2 text-orange-500" />
-        <div className="text-2xl font-bold text-gray-900">{stats.currentStreak}</div>
-        <div className="text-sm text-gray-600">Current Streak</div>
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <Card className="p-3 sm:p-4 text-center">
+        <Flame className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-2 text-orange-500" />
+        <div className="text-xl sm:text-2xl font-bold text-gray-900">{stats.currentStreak}</div>
+        <div className="text-xs sm:text-sm text-gray-600">Current Streak</div>
       </Card>
       
-      <Card className="p-4 text-center">
-        <TrendingUp className="w-6 h-6 mx-auto mb-2 text-green-500" />
-        <div className="text-2xl font-bold text-gray-900">{stats.longestStreak}</div>
-        <div className="text-sm text-gray-600">Best Streak</div>
+      <Card className="p-3 sm:p-4 text-center">
+        <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-2 text-green-500" />
+        <div className="text-xl sm:text-2xl font-bold text-gray-900">{stats.longestStreak}</div>
+        <div className="text-xs sm:text-sm text-gray-600">Best Streak</div>
       </Card>
       
-      <Card className="p-4 text-center">
-        <Calendar className="w-6 h-6 mx-auto mb-2 text-blue-500" />
-        <div className="text-2xl font-bold text-gray-900">{stats.completionRate}%</div>
-        <div className="text-sm text-gray-600">30-Day Rate</div>
+      <Card className="p-3 sm:p-4 text-center">
+        <Calendar className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-2 text-blue-500" />
+        <div className="text-xl sm:text-2xl font-bold text-gray-900">{stats.completionRate}%</div>
+        <div className="text-xs sm:text-sm text-gray-600">30-Day Rate</div>
       </Card>
       
-      <Card className="p-4 text-center">
-        <div 
-          className="w-6 h-6 mx-auto mb-2 rounded-full"
-          style={{ backgroundColor: trackable.color }}
-        />
-        <div className="text-2xl font-bold text-gray-900">{stats.totalCompletions}</div>
-        <div className="text-sm text-gray-600">Total Done</div>
+      <Card className="p-3 sm:p-4 text-center">
+        <Target className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-2 text-purple-500" />
+        <div className="text-xl sm:text-2xl font-bold text-gray-900">{stats.totalCompletions}</div>
+        <div className="text-xs sm:text-sm text-gray-600">Total Done</div>
       </Card>
     </div>
   );

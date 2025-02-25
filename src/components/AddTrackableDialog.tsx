@@ -46,46 +46,49 @@ export function AddTrackableDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Trackable
+        <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-xs sm:text-sm">
+          <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+          <span className="hidden sm:inline">Add Trackable</span>
+          <span className="sm:hidden">Add</span>
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="w-[95vw] max-w-md mx-auto">
         <DialogHeader>
-          <DialogTitle>Create New Trackable</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-lg sm:text-xl">Create New Trackable</DialogTitle>
+          <DialogDescription className="text-sm">
             Add a new activity or habit to track daily.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name" className="text-sm">Name</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., Exercise, Reading, Meditation"
               required
+              className="text-sm"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description" className="text-sm">Description</Label>
             <Input
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief description of the activity"
+              className="text-sm"
             />
           </div>
           <div className="space-y-2">
-            <Label>Color</Label>
+            <Label className="text-sm">Color</Label>
             <div className="flex gap-2 flex-wrap">
               {colors.map((color) => (
                 <button
                   key={color}
                   type="button"
-                  className={`w-8 h-8 rounded-full border-2 ${
+                  className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 ${
                     selectedColor === color ? 'border-gray-900' : 'border-gray-200'
                   }`}
                   style={{ backgroundColor: color }}
@@ -94,11 +97,11 @@ export function AddTrackableDialog() {
               ))}
             </div>
           </div>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+          <div className="flex flex-col sm:flex-row justify-end gap-2">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} className="text-sm">
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || !name.trim()}>
+            <Button type="submit" disabled={loading || !name.trim()} className="text-sm">
               {loading ? 'Creating...' : 'Create Trackable'}
             </Button>
           </div>
