@@ -8,6 +8,7 @@ import { TrackableManagement } from './TrackableManagement';
 import { StreakDisplay } from './StreakDisplay';
 import { GoalProgressChart } from './GoalProgressChart';
 import { DashboardCustomization } from './DashboardCustomization';
+import { ThemeToggle } from './ThemeToggle';
 import { useTrackables } from '@/hooks/useTrackables';
 import { useDashboardSettings } from '@/hooks/useDashboardSettings';
 import { useAuth } from '@/contexts/AuthContext';
@@ -77,29 +78,28 @@ export function Dashboard() {
 
   if (loading || settingsLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading your trackables...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading your trackables...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b px-4 sm:px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2 sm:gap-4">
-          <SidebarTrigger className="md:hidden">
-            <Menu className="h-5 w-5" />
-          </SidebarTrigger>
+    <div className="min-h-screen bg-background">
+      <header className="bg-card border-b border-border px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div className="flex items-center gap-3">
+          <SidebarTrigger />
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-sm sm:text-base text-gray-600 hidden sm:block">Track your daily habits and progress</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Dashboard</h1>
+            <p className="text-sm text-muted-foreground hidden sm:block">Track your daily habits and progress</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 sm:gap-4">
-          <span className="text-xs sm:text-sm text-gray-600 hidden sm:inline">Welcome, {user?.email}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground hidden sm:inline">Welcome, {user?.email}</span>
+          <ThemeToggle />
           <DashboardCustomization 
             trackables={trackables} 
             onSettingsChange={handleSettingsChange}
@@ -107,7 +107,7 @@ export function Dashboard() {
           <AddTrackableDialog />
           <button
             onClick={signOut}
-            className="text-xs sm:text-sm text-gray-500 hover:text-gray-700"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             Sign Out
           </button>
@@ -117,14 +117,14 @@ export function Dashboard() {
       <div className="p-4 sm:p-6">
         {trackables.length === 0 ? (
           <div className="text-center py-12">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">No trackables yet</h2>
-            <p className="text-sm sm:text-base text-gray-600 mb-6">Create your first trackable to start tracking your daily habits.</p>
+            <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4">No trackables yet</h2>
+            <p className="text-sm sm:text-base text-muted-foreground mb-6">Create your first trackable to start tracking your daily habits.</p>
             <AddTrackableDialog />
           </div>
         ) : displayTrackables.length === 0 ? (
           <div className="text-center py-12">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">No activities selected</h2>
-            <p className="text-sm sm:text-base text-gray-600 mb-6">Customize your dashboard to select which activities to display.</p>
+            <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4">No activities selected</h2>
+            <p className="text-sm sm:text-base text-muted-foreground mb-6">Customize your dashboard to select which activities to display.</p>
             <DashboardCustomization 
               trackables={trackables} 
               onSettingsChange={handleSettingsChange}
@@ -142,9 +142,9 @@ export function Dashboard() {
               {/* Trackables Grid */}
               <section>
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Your Activities</h2>
+                  <h2 className="text-lg sm:text-xl font-semibold text-foreground">Your Activities</h2>
                   {displayTrackables.length !== trackables.length && (
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       Showing {displayTrackables.length} of {trackables.length} activities
                     </p>
                   )}
@@ -163,48 +163,46 @@ export function Dashboard() {
 
               {/* Stats for selected trackable */}
               {currentTrackable && (
-                <section>
-                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
-                    Stats: {currentTrackable.name}
-                  </h2>
-                  <StreakDisplay trackable={currentTrackable} />
-                </section>
-              )}
+                <>
+                  <section>
+                    <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4">
+                      Stats: {currentTrackable.name}
+                    </h2>
+                    <StreakDisplay trackable={currentTrackable} />
+                  </section>
 
-              {/* Goal Progress Chart */}
-              {currentTrackable && (
-                <section>
-                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
-                    Goal Progress: {currentTrackable.name}
-                  </h2>
-                  <GoalProgressChart trackable={currentTrackable} />
-                </section>
-              )}
+                  {/* Goal Progress Chart */}
+                  <section>
+                    <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4">
+                      Goal Progress: {currentTrackable.name}
+                    </h2>
+                    <GoalProgressChart trackable={currentTrackable} />
+                  </section>
 
-              {/* Calendar Visualization */}
-              {currentTrackable && (
-                <section>
-                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
-                    Progress Calendar: {currentTrackable.name}
-                  </h2>
-                  <div className="bg-white rounded-xl shadow-sm border p-4 sm:p-6">
-                    <ContributionCalendar trackable={currentTrackable} />
-                  </div>
-                </section>
+                  {/* Calendar Visualization */}
+                  <section>
+                    <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4">
+                      Progress Calendar: {currentTrackable.name}
+                    </h2>
+                    <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6">
+                      <ContributionCalendar trackable={currentTrackable} />
+                    </div>
+                  </section>
+                </>
               )}
             </TabsContent>
 
             <TabsContent value="checkin">
               <section>
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Today's Check-in</h2>
-                <div className="bg-white rounded-xl shadow-sm border p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4">Today's Check-in</h2>
+                <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6">
                   <DailyCheckIn trackables={trackables} />
                 </div>
               </section>
             </TabsContent>
 
             <TabsContent value="manage">
-              <div className="bg-white rounded-xl shadow-sm border p-4 sm:p-6">
+              <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6">
                 <TrackableManagement trackables={trackables} />
               </div>
             </TabsContent>
