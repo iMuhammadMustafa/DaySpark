@@ -257,6 +257,44 @@ export type Database = {
           },
         ]
       }
+      goals: {
+        Row: {
+          created_at: string
+          id: string
+          target_period: string
+          target_value: number
+          trackable_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          target_period: string
+          target_value: number
+          trackable_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          target_period?: string
+          target_value?: number
+          trackable_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goals_trackable_id_fkey"
+            columns: ["trackable_id"]
+            isOneToOne: false
+            referencedRelation: "trackables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string

@@ -7,6 +7,7 @@ import { DailyCheckIn } from './DailyCheckIn';
 import { AddTrackableDialog } from './AddTrackableDialog';
 import { TrackableManagement } from './TrackableManagement';
 import { StreakDisplay } from './StreakDisplay';
+import { GoalProgressChart } from './GoalProgressChart';
 import { useTrackables } from '@/hooks/useTrackables';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -99,6 +100,16 @@ export function Dashboard() {
                     Stats: {currentTrackable.name}
                   </h2>
                   <StreakDisplay trackable={currentTrackable} />
+                </section>
+              )}
+
+              {/* Goal Progress Chart */}
+              {currentTrackable && (
+                <section>
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
+                    Goal Progress: {currentTrackable.name}
+                  </h2>
+                  <GoalProgressChart trackable={currentTrackable} />
                 </section>
               )}
 
