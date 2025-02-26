@@ -219,6 +219,33 @@ export type Database = {
           },
         ]
       }
+      dashboard_settings: {
+        Row: {
+          created_at: string
+          id: string
+          selected_trackables: string[]
+          trackable_order: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          selected_trackables?: string[]
+          trackable_order?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          selected_trackables?: string[]
+          trackable_order?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       entries: {
         Row: {
           completed: boolean
