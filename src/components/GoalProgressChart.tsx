@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, ReferenceLine } from 'recharts';
 import { Target, TrendingUp, AlertCircle } from 'lucide-react';
 import { useEntries } from '@/hooks/useEntries';
 import { useGoals } from '@/hooks/useGoals';
@@ -104,6 +104,14 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
     return <Target className="w-4 h-4 text-blue-600" />;
   };
 
+  // Chart configuration for shadcn/ui chart
+  const chartConfig = {
+    progress: {
+      label: "Progress",
+      color: trackable.color,
+    },
+  };
+
   return (
     <Card className="p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
@@ -135,7 +143,7 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
       </div>
 
       <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
+        <ChartContainer config={chartConfig}>
           <LineChart data={chartData}>
             <XAxis 
               dataKey="date" 
@@ -166,7 +174,7 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
               label={{ value: "Goal", position: "top" }}
             />
           </LineChart>
-        </ResponsiveContainer>
+        </ChartContainer>
       </div>
 
       {progressPercentage >= 100 && (
