@@ -139,7 +139,7 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
         <p className="text-sm text-muted-foreground mb-3">
           Target: {goal.target_value} times per {goal.target_period.replace('ly', '')}
         </p>
-        <div className="w-full bg-muted rounded-full h-4 overflow-hidden">
+        <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-500 ease-out"
             style={{
@@ -152,19 +152,22 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
 
       <div className="h-64">
         <ChartContainer config={chartConfig}>
-          <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <LineChart 
+            data={chartData} 
+            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+          >
             <XAxis 
               dataKey="date" 
-              tick={{ fontSize: 12, fill: 'currentColor' }}
+              tick={{ fontSize: 12 }}
               interval="preserveStartEnd"
-              axisLine={{ stroke: 'currentColor', opacity: 0.2 }}
-              tickLine={{ stroke: 'currentColor', opacity: 0.2 }}
+              axisLine={{ stroke: 'hsl(var(--border))', strokeWidth: 1 }}
+              tickLine={{ stroke: 'hsl(var(--border))', strokeWidth: 1 }}
             />
             <YAxis 
-              tick={{ fontSize: 12, fill: 'currentColor' }}
+              tick={{ fontSize: 12 }}
               domain={[0, Math.max(goal.target_value, Math.max(...chartData.map(d => d.progress)) || 0)]}
-              axisLine={{ stroke: 'currentColor', opacity: 0.2 }}
-              tickLine={{ stroke: 'currentColor', opacity: 0.2 }}
+              axisLine={{ stroke: 'hsl(var(--border))', strokeWidth: 1 }}
+              tickLine={{ stroke: 'hsl(var(--border))', strokeWidth: 1 }}
             />
             <ChartTooltip 
               content={<ChartTooltipContent />}
@@ -187,7 +190,7 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
               label={{ 
                 value: `Goal: ${goal.target_value}`, 
                 position: "top",
-                style: { fontSize: '12px', fill: 'currentColor' }
+                style: { fontSize: '12px', fill: 'hsl(var(--foreground))' }
               }}
             />
           </LineChart>
@@ -195,7 +198,7 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
       </div>
 
       {progressPercentage >= 100 && (
-        <div className="mt-4 p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
+        <div className="mt-4 p-3 bg-green-50 dark:bg-green-950/50 border border-green-200 dark:border-green-800 rounded-lg">
           <div className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
             <span className="text-sm font-medium text-green-800 dark:text-green-200">

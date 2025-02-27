@@ -70,13 +70,22 @@ export function ContributionCalendar({ trackable }: ContributionCalendarProps) {
   const getMonthLabels = () => {
     const labels = [];
     const today = new Date();
+    const year = today.getFullYear();
     
     for (let month = 0; month < 12; month++) {
-      const date = new Date(today.getFullYear(), month, 1);
+      const date = new Date(year, month, 1);
       if (date <= today) {
+        // Calculate which week this month starts in
+        const monthStart = new Date(year, month, 1);
+        const yearStart = new Date(year, 0, 1);
+        const daysDiff = Math.floor((monthStart.getTime() - yearStart.getTime()) / (1000 * 60 * 60 * 24));
+        const firstDayOfYear = getDay(yearStart);
+        const paddingDays = firstDayOfYear === 0 ? 6 : firstDayOfYear - 1;
+        const weekIndex = Math.floor((daysDiff + paddingDays) / 7);
+        
         labels.push({
           month: months[month],
-          position: month * 4.3, // Approximate position
+          weekIndex: weekIndex,
         });
       }
     }
@@ -109,9 +118,16 @@ export function ContributionCalendar({ trackable }: ContributionCalendarProps) {
       <div className="overflow-x-auto">
         <div className="inline-block min-w-full">
           {/* Month labels */}
-          <div className="hidden sm:flex text-xs text-muted-foreground mb-2 pl-8">
+          <div className="hidden sm:flex text-xs text-muted-foreground mb-2 relative" style={{ paddingLeft: '32px' }}>
             {getMonthLabels().map((label, index) => (
-              <div key={index} className="w-11 text-left">
+              <div 
+                key={index} 
+                className="absolute text-left"
+                style={{ 
+                  left: `${32 + (label.weekIndex * 16)}px`,
+                  minWidth: '28px'
+                }}
+              >
                 {label.month}
               </div>
             ))}
@@ -120,9 +136,16 @@ export function ContributionCalendar({ trackable }: ContributionCalendarProps) {
           {/* Calendar grid */}
           <div className="flex">
             {/* Day labels */}
-            <div className="hidden sm:flex flex-col text-xs text-muted-foreground mr-2 gap-1">
+            <div className="hidden sm:flex flex-col text-xs text-muted-foreground mr-2 w-7">
               {dayLabels.map((day, index) => (
-                <div key={day} className="h-3 flex items-center" style={{ marginTop: index === 0 ? '0' : '6px' }}>
+                <div 
+                  key={day} 
+                  className="h-3 flex items-center justify-end pr-1" 
+                  style={{ 
+                    marginTop: index === 0 ? '0' : '4px',
+                    marginBottom: '4px'
+                  }}
+                >
                   {day}
                 </div>
               ))}
