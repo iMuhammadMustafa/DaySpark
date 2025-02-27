@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { LineChart, Line, XAxis, YAxis, ReferenceLine } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, ReferenceLine, Dot } from 'recharts';
 import { Target, TrendingUp, AlertCircle } from 'lucide-react';
 import { useEntries } from '@/hooks/useEntries';
 import { useGoals } from '@/hooks/useGoals';
@@ -12,6 +11,24 @@ import { format, subDays, startOfWeek, startOfMonth, startOfYear, endOfWeek, end
 interface GoalProgressChartProps {
   trackable: Trackable;
 }
+
+// Custom dot component to show activity days
+const ActivityDot = (props: any) => {
+  const { cx, cy, payload } = props;
+  if (payload.hasActivity) {
+    return (
+      <Dot 
+        cx={cx} 
+        cy={cy} 
+        r={6} 
+        fill={payload.trackableColor} 
+        stroke="#fff" 
+        strokeWidth={2}
+      />
+    );
+  }
+  return null;
+};
 
 export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
   const { entries } = useEntries(trackable.id);
@@ -76,9 +93,18 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
   const chartDays = Math.max(30, periodDays);
   const chartData = [];
   
+  // Create a set of dates with activities for quick lookup
+  const activityDates = new Set(
+    entries
+      .filter(e => e.completed)
+      .map(e => e.date)
+  );
+  
   for (let i = chartDays - 1; i >= 0; i--) {
     const date = subDays(today, i);
+    const dateString = format(date, 'yyyy-MM-dd');
     let cumulativeProgress = 0;
+    
     if (date >= periodStart) {
       cumulativeProgress = entries.filter(e => {
         const entryDate = new Date(e.date);
@@ -90,6 +116,8 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
       date: format(date, 'MMM dd'),
       progress: cumulativeProgress,
       target: date >= periodStart ? goal.target_value : null,
+      hasActivity: activityDates.has(dateString),
+      trackableColor: trackable.color,
     });
   }
 
@@ -150,11 +178,13 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
         </div>
       </div>
 
-      <div className="h-64">
-        <ChartContainer config={chartConfig}>
+      {/* Fixed height container with proper overflow handling */}
+      <div className="h-64 w-full overflow-hidden">
+        <ChartContainer config={chartConfig} className="h-full w-full">
           <LineChart 
             data={chartData} 
             margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+            height={240}
           >
             <XAxis 
               dataKey="date" 
@@ -178,7 +208,7 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
               dataKey="progress"
               stroke={trackable.color}
               strokeWidth={3}
-              dot={{ fill: trackable.color, strokeWidth: 2, r: 4 }}
+              dot={<ActivityDot />}
               activeDot={{ r: 6, stroke: trackable.color, strokeWidth: 2 }}
               name="Progress"
             />
@@ -195,6 +225,21 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
             />
           </LineChart>
         </ChartContainer>
+      </div>
+
+      {/* Legend for activity days */}
+      <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <div 
+            className="w-3 h-3 rounded-full border-2 border-white"
+            style={{ backgroundColor: trackable.color }}
+          />
+          <span>Days with activity</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 border border-muted-foreground rounded-full" />
+          <span>Days without activity</span>
+        </div>
       </div>
 
       {progressPercentage >= 100 && (
