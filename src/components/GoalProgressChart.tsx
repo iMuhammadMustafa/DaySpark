@@ -15,19 +15,33 @@ interface GoalProgressChartProps {
 // Custom dot component to show activity days
 const ActivityDot = (props: any) => {
   const { cx, cy, payload } = props;
-  if (payload.hasActivity) {
+  console.log('ActivityDot payload:', payload);
+  
+  // Check if this day has activity
+  if (payload && payload.hasActivity) {
     return (
       <Dot 
         cx={cx} 
         cy={cy} 
         r={6} 
-        fill={payload.trackableColor} 
+        fill={payload.trackableColor || '#3b82f6'} 
         stroke="#fff" 
         strokeWidth={2}
       />
     );
   }
-  return null;
+  
+  // Return a smaller, less visible dot for days without activity
+  return (
+    <Dot 
+      cx={cx} 
+      cy={cy} 
+      r={2} 
+      fill="transparent" 
+      stroke="#d1d5db" 
+      strokeWidth={1}
+    />
+  );
 };
 
 export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
@@ -100,6 +114,8 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
       .map(e => e.date)
   );
   
+  console.log('Activity dates:', Array.from(activityDates));
+  
   for (let i = chartDays - 1; i >= 0; i--) {
     const date = subDays(today, i);
     const dateString = format(date, 'yyyy-MM-dd');
@@ -112,11 +128,14 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
       }).length;
     }
 
+    const hasActivity = activityDates.has(dateString);
+    console.log(`Date ${dateString}: hasActivity = ${hasActivity}`);
+
     chartData.push({
       date: format(date, 'MMM dd'),
       progress: cumulativeProgress,
       target: date >= periodStart ? goal.target_value : null,
-      hasActivity: activityDates.has(dateString),
+      hasActivity,
       trackableColor: trackable.color,
     });
   }
