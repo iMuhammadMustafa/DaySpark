@@ -19,26 +19,31 @@ const navigationItems = [
     title: "Dashboard",
     url: "/",
     icon: BarChart3,
+    type: "route" as const,
   },
   {
     title: "Calendar View",
     url: "/calendar",
     icon: CalendarDays,
+    type: "route" as const,
   },
   {
     title: "Check-in",
     url: "#checkin",
     icon: Check,
+    type: "tab" as const,
   },
   {
     title: "Add Trackable",
     url: "#add",
     icon: Plus,
+    type: "dialog" as const,
   },
   {
     title: "Manage",
     url: "#manage",
     icon: User,
+    type: "tab" as const,
   },
 ];
 
@@ -46,22 +51,49 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleNavigation = (url: string) => {
-    if (url.startsWith('#')) {
-      const section = url.substring(1);
-      if (section === 'add') {
-        // Trigger add trackable dialog
+  const handleNavigation = (item: typeof navigationItems[0]) => {
+    if (item.type === 'route') {
+      // Navigate to the page
+      navigate(item.url);
+    } else if (item.type === 'dialog') {
+      // For dialogs, only navigate to dashboard if not already there, then trigger dialog
+      if (location.pathname !== '/') {
+        navigate('/');
+        // Wait for navigation to complete before triggering dialog
+        setTimeout(() => {
+          const section = item.url.substring(1);
+          const addButton = document.querySelector('[data-dialog="add-trackable"]') as HTMLElement;
+          addButton?.click();
+        }, 100);
+      } else {
+        const section = item.url.substring(1);
         const addButton = document.querySelector('[data-dialog="add-trackable"]') as HTMLElement;
         addButton?.click();
+      }
+    } else if (item.type === 'tab') {
+      // For tabs, only navigate to dashboard if not already there, then switch tab
+      if (location.pathname !== '/') {
+        navigate('/');
+        // Wait for navigation to complete before switching tab
+        setTimeout(() => {
+          const section = item.url.substring(1);
+          const tabTrigger = document.querySelector(`[value="${section}"]`) as HTMLElement;
+          tabTrigger?.click();
+        }, 100);
       } else {
-        // Switch to the appropriate tab
+        const section = item.url.substring(1);
         const tabTrigger = document.querySelector(`[value="${section}"]`) as HTMLElement;
         tabTrigger?.click();
       }
-    } else {
-      // Navigate to the page
-      navigate(url);
     }
+  };
+
+  const isItemActive = (item: typeof navigationItems[0]) => {
+    if (item.type === 'route') {
+      return location.pathname === item.url;
+    }
+    // For tabs and dialogs, they're active when on dashboard
+    return location.pathname === '/' && item.type !== 'route';
   };
 
   return (
@@ -88,9 +120,9 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton 
                     className={`hover:bg-accent hover:text-accent-foreground transition-colors ${
-                      location.pathname === item.url ? 'bg-accent text-accent-foreground' : ''
+                      isItemActive(item) ? 'bg-accent text-accent-foreground' : ''
                     }`}
-                    onClick={() => handleNavigation(item.url)}
+                    onClick={() => handleNavigation(item)}
                   >
                     <item.icon className="w-4 h-4" />
                     <span className="font-medium">{item.title}</span>
