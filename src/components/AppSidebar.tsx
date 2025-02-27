@@ -93,7 +93,7 @@ export function AppSidebar() {
       return location.pathname === item.url;
     }
     // For tabs and dialogs, they're active when on dashboard
-    return location.pathname === '/' && item.type !== 'route';
+    return location.pathname === '/';
   };
 
   return (
