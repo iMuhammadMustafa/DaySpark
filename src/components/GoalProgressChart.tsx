@@ -186,7 +186,7 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
               strokeWidth={2}
               label={{ 
                 value: `Goal: ${goal.target_value}`, 
-                position: "topRight",
+                position: "top",
                 style: { fontSize: '12px', fill: 'currentColor' }
               }}
             />
