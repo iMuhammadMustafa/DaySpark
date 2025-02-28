@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ContributionCalendar } from './ContributionCalendar';
+import { OverallContributionCalendar } from './OverallContributionCalendar';
 import { TrackableCard } from './TrackableCard';
 import { DailyCheckIn } from './DailyCheckIn';
 import { AddTrackableDialog } from './AddTrackableDialog';
@@ -139,6 +140,11 @@ export function Dashboard() {
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6 sm:space-y-8">
+              {/* Overall Activity Calendar */}
+              <section>
+                <OverallContributionCalendar />
+              </section>
+
               {/* Trackables Grid */}
               <section>
                 <div className="flex items-center justify-between mb-4">
