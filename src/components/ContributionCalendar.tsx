@@ -117,15 +117,16 @@ export function ContributionCalendar({ trackable }: ContributionCalendarProps) {
       
       <div className="overflow-x-auto">
         <div className="inline-block min-w-full">
-          {/* Month labels */}
-          <div className="hidden sm:flex text-xs text-muted-foreground mb-2 relative" style={{ paddingLeft: '32px' }}>
+          {/* Month labels - positioned above the calendar with proper spacing */}
+          <div className="hidden sm:flex text-xs text-muted-foreground mb-1 relative" style={{ paddingLeft: '32px', height: '16px' }}>
             {getMonthLabels().map((label, index) => (
               <div 
                 key={index} 
                 className="absolute text-left"
                 style={{ 
                   left: `${32 + (label.weekIndex * 16)}px`,
-                  minWidth: '28px'
+                  minWidth: '32px',
+                  top: '0px'
                 }}
               >
                 {label.month}
