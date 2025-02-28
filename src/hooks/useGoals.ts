@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDemo } from '@/contexts/DemoContext';
 import { useToast } from '@/hooks/use-toast';
 
 export interface Goal {
@@ -17,10 +17,20 @@ export function useGoals(trackableId?: string) {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { isDemoMode, demoGoals } = useDemo();
   const { toast } = useToast();
 
   const fetchGoals = async () => {
     if (!user) return;
+
+    if (isDemoMode) {
+      const filteredGoals = trackableId 
+        ? demoGoals.filter(goal => goal.trackable_id === trackableId)
+        : demoGoals;
+      setGoals(filteredGoals);
+      setLoading(false);
+      return;
+    }
 
     try {
       let query = supabase
@@ -51,6 +61,15 @@ export function useGoals(trackableId?: string) {
   const createGoal = async (goal: Omit<Goal, 'id' | 'created_at' | 'updated_at'>) => {
     if (!user) return;
 
+    if (isDemoMode) {
+      toast({
+        title: "Demo Mode",
+        description: "Cannot create goals in demo mode",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('goals')
@@ -77,6 +96,15 @@ export function useGoals(trackableId?: string) {
 
   const updateGoal = async (id: string, updates: Partial<Goal>) => {
     if (!user) return;
+
+    if (isDemoMode) {
+      toast({
+        title: "Demo Mode",
+        description: "Cannot update goals in demo mode",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -106,6 +134,15 @@ export function useGoals(trackableId?: string) {
   const deleteGoal = async (id: string) => {
     if (!user) return;
 
+    if (isDemoMode) {
+      toast({
+        title: "Demo Mode",
+        description: "Cannot delete goals in demo mode",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('goals')
@@ -130,7 +167,7 @@ export function useGoals(trackableId?: string) {
 
   useEffect(() => {
     fetchGoals();
-  }, [user, trackableId]);
+  }, [user, trackableId, isDemoMode]);
 
   return {
     goals,
