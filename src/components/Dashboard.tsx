@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ContributionCalendar } from './ContributionCalendar';
@@ -8,18 +9,16 @@ import { AddTrackableDialog } from './AddTrackableDialog';
 import { TrackableManagement } from './TrackableManagement';
 import { StreakDisplay } from './StreakDisplay';
 import { GoalProgressChart } from './GoalProgressChart';
-import { DashboardCustomization } from './DashboardCustomization';
 import { ThemeToggle } from './ThemeToggle';
 import { useTrackables } from '@/hooks/useTrackables';
 import { useDashboardSettings } from '@/hooks/useDashboardSettings';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Menu } from 'lucide-react';
 
 export function Dashboard() {
   const { trackables, loading } = useTrackables();
   const { settings, loading: settingsLoading } = useDashboardSettings();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [selectedTrackable, setSelectedTrackable] = useState<string | null>(null);
   const [customSelectedTrackables, setCustomSelectedTrackables] = useState<string[]>([]);
   const [customTrackableOrder, setCustomTrackableOrder] = useState<string[]>([]);
@@ -90,28 +89,17 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="bg-card border-b border-border px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-50">
-        <div className="flex items-center gap-3">
+      <header className="bg-card border-b border-border px-4 sm:px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+        <div className="flex items-center gap-4">
           <SidebarTrigger />
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-foreground">Dashboard</h1>
             <p className="text-sm text-muted-foreground hidden sm:block">Track your daily habits and progress</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground hidden sm:inline">Welcome, {user?.email}</span>
+        <div className="flex items-center gap-3">
           <ThemeToggle />
-          <DashboardCustomization 
-            trackables={trackables} 
-            onSettingsChange={handleSettingsChange}
-          />
           <AddTrackableDialog />
-          <button
-            onClick={signOut}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Sign Out
-          </button>
         </div>
       </header>
 
@@ -126,10 +114,6 @@ export function Dashboard() {
           <div className="text-center py-12">
             <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4">No activities selected</h2>
             <p className="text-sm sm:text-base text-muted-foreground mb-6">Customize your dashboard to select which activities to display.</p>
-            <DashboardCustomization 
-              trackables={trackables} 
-              onSettingsChange={handleSettingsChange}
-            />
           </div>
         ) : (
           <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">

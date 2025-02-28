@@ -10,9 +10,13 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
-import { Calendar, Plus, User, Check, BarChart3, CalendarDays } from "lucide-react";
+import { Calendar, Plus, User, Check, BarChart3, CalendarDays, Settings, LogOut } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from '@/contexts/AuthContext';
+import { useTrackables } from '@/hooks/useTrackables';
+import { DashboardCustomization } from './DashboardCustomization';
 
 const navigationItems = [
   {
@@ -50,6 +54,8 @@ const navigationItems = [
 export function AppSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, signOut } = useAuth();
+  const { trackables } = useTrackables();
 
   const handleNavigation = (item: typeof navigationItems[0]) => {
     if (item.type === 'route') {
@@ -92,8 +98,13 @@ export function AppSidebar() {
     if (item.type === 'route') {
       return location.pathname === item.url;
     }
-    // For tabs and dialogs, they're active when on dashboard
-    return location.pathname === '/';
+    // For tabs and dialogs, they're only active when on dashboard AND not when on other routes
+    return false; // We'll handle tab active state differently in the Dashboard component
+  };
+
+  const handleSettingsChange = (selectedIds: string[], orderedIds: string[]) => {
+    // This will be handled by the DashboardCustomization component itself
+    // and passed down to the Dashboard component
   };
 
   return (
@@ -109,6 +120,7 @@ export function AppSidebar() {
           </div>
         </div>
       </SidebarHeader>
+      
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">
@@ -132,7 +144,46 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {location.pathname === '/' && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">
+              Settings
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <div className="px-2">
+                    <DashboardCustomization 
+                      trackables={trackables} 
+                      onSettingsChange={handleSettingsChange}
+                    />
+                  </div>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
+
+      <SidebarFooter className="border-t border-border p-4">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <div className="text-xs text-muted-foreground mb-2 px-2">
+              {user?.email}
+            </div>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              onClick={signOut}
+              className="hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="font-medium">Sign Out</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
