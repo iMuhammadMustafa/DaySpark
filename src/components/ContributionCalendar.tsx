@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { useEntries } from '@/hooks/useEntries';
 import { Trackable } from '@/hooks/useTrackables';
 import { format, startOfYear, endOfYear, eachDayOfInterval, getDay, startOfWeek } from 'date-fns';
-import { DateCheckInDialog } from './DateCheckInDialog';
+import { SingleTrackableDateDialog } from './SingleTrackableDateDialog';
 
 interface ContributionCalendarProps {
   trackable: Trackable;
@@ -187,7 +186,7 @@ export function ContributionCalendar({ trackable }: ContributionCalendarProps) {
       </div>
 
       {showDateDialog && selectedDate && (
-        <DateCheckInDialog
+        <SingleTrackableDateDialog
           trackable={trackable}
           date={selectedDate}
           isOpen={showDateDialog}
