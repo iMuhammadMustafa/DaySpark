@@ -9,7 +9,7 @@ const Index = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gray-50">
         <AppSidebar />
-        <main className="flex-1">
+        <main className="flex-1 min-w-0">
           <Dashboard />
         </main>
       </div>
