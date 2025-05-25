@@ -2,9 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Check } from 'lucide-react';
+import { Check, StickyNote } from 'lucide-react';
 import { Trackable } from '@/hooks/useTrackables';
 import { useEntries } from '@/hooks/useEntries';
+import { NotesDialog } from './NotesDialog';
 
 interface DailyCheckInProps {
   trackables: Trackable[];
@@ -13,6 +14,11 @@ interface DailyCheckInProps {
 export function DailyCheckIn({ trackables }: DailyCheckInProps) {
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [notesDialog, setNotesDialog] = useState<{
+    isOpen: boolean;
+    trackableId: string;
+    trackableName: string;
+  }>({ isOpen: false, trackableId: '', trackableName: '' });
   const { entries, createEntry, deleteEntry } = useEntries();
 
   const today = new Date().toISOString().split('T')[0];
@@ -43,6 +49,14 @@ export function DailyCheckIn({ trackables }: DailyCheckInProps) {
     }
   };
 
+  const handleAddNotes = (trackableId: string, trackableName: string) => {
+    setNotesDialog({
+      isOpen: true,
+      trackableId,
+      trackableName
+    });
+  };
+
   const handleSubmit = () => {
     setIsSubmitted(true);
     setTimeout(() => setIsSubmitted(false), 3000);
@@ -54,6 +68,9 @@ export function DailyCheckIn({ trackables }: DailyCheckInProps) {
     month: 'long', 
     day: 'numeric' 
   });
+
+  const todayEntry = (trackableId: string) => 
+    entries.find(e => e.trackable_id === trackableId && e.date === today);
 
   return (
     <div className="space-y-6">
@@ -70,36 +87,51 @@ export function DailyCheckIn({ trackables }: DailyCheckInProps) {
         </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {trackables.map((trackable) => (
-            <div
-              key={trackable.id}
-              className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
-                checkedItems.has(trackable.id)
-                  ? 'border-green-300 bg-green-50'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-              onClick={() => handleToggle(trackable.id)}
-            >
-              <div className="flex items-center gap-3">
-                <Checkbox
-                  checked={checkedItems.has(trackable.id)}
-                  onChange={() => handleToggle(trackable.id)}
-                  className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                />
-                <div 
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: trackable.color }}
-                />
-                <div className="flex-1">
-                  <h4 className="font-medium text-gray-900">{trackable.name}</h4>
-                  <p className="text-sm text-gray-600">{trackable.description}</p>
+          {trackables.map((trackable) => {
+            const entry = todayEntry(trackable.id);
+            return (
+              <div
+                key={trackable.id}
+                className={`p-4 border rounded-lg transition-all duration-200 ${
+                  checkedItems.has(trackable.id)
+                    ? 'border-green-300 bg-green-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Checkbox
+                    checked={checkedItems.has(trackable.id)}
+                    onCheckedChange={() => handleToggle(trackable.id)}
+                    className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                  />
+                  <div 
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: trackable.color }}
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">{trackable.name}</h4>
+                    <p className="text-sm text-gray-600">{trackable.description}</p>
+                    {entry?.notes && (
+                      <p className="text-xs text-gray-500 mt-1 italic">"{entry.notes}"</p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleAddNotes(trackable.id, trackable.name)}
+                      className="p-1 h-8 w-8"
+                    >
+                      <StickyNote className="w-4 h-4" />
+                    </Button>
+                    {checkedItems.has(trackable.id) && (
+                      <Check className="w-5 h-5 text-green-500" />
+                    )}
+                  </div>
                 </div>
-                {checkedItems.has(trackable.id) && (
-                  <Check className="w-5 h-5 text-green-500" />
-                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -125,6 +157,14 @@ export function DailyCheckIn({ trackables }: DailyCheckInProps) {
           </Button>
         </div>
       )}
+
+      <NotesDialog
+        isOpen={notesDialog.isOpen}
+        onClose={() => setNotesDialog(prev => ({ ...prev, isOpen: false }))}
+        trackableId={notesDialog.trackableId}
+        trackableName={notesDialog.trackableName}
+        date={today}
+      />
     </div>
   );
 }

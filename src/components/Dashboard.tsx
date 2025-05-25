@@ -5,8 +5,11 @@ import { ContributionCalendar } from './ContributionCalendar';
 import { TrackableCard } from './TrackableCard';
 import { DailyCheckIn } from './DailyCheckIn';
 import { AddTrackableDialog } from './AddTrackableDialog';
+import { TrackableManagement } from './TrackableManagement';
+import { StreakDisplay } from './StreakDisplay';
 import { useTrackables } from '@/hooks/useTrackables';
 import { useAuth } from '@/contexts/AuthContext';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export function Dashboard() {
   const { trackables, loading } = useTrackables();
@@ -55,7 +58,7 @@ export function Dashboard() {
         </div>
       </header>
 
-      <div className="p-6 space-y-8">
+      <div className="p-6">
         {trackables.length === 0 ? (
           <div className="text-center py-12">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">No trackables yet</h2>
@@ -63,42 +66,67 @@ export function Dashboard() {
             <AddTrackableDialog />
           </div>
         ) : (
-          <>
-            {/* Trackables Grid */}
-            <section>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Trackables</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {trackables.map((trackable) => (
-                  <TrackableCard
-                    key={trackable.id}
-                    trackable={trackable}
-                    isSelected={selectedTrackable === trackable.id}
-                    onClick={() => setSelectedTrackable(trackable.id)}
-                  />
-                ))}
-              </div>
-            </section>
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList>
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="checkin">Daily Check-in</TabsTrigger>
+              <TabsTrigger value="manage">Manage</TabsTrigger>
+            </TabsList>
 
-            {/* Calendar Visualization */}
-            {currentTrackable && (
+            <TabsContent value="overview" className="space-y-8">
+              {/* Trackables Grid */}
               <section>
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                  Progress for: {currentTrackable.name}
-                </h2>
-                <div className="bg-white rounded-xl shadow-sm border p-6">
-                  <ContributionCalendar trackable={currentTrackable} />
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Trackables</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {trackables.map((trackable) => (
+                    <TrackableCard
+                      key={trackable.id}
+                      trackable={trackable}
+                      isSelected={selectedTrackable === trackable.id}
+                      onClick={() => setSelectedTrackable(trackable.id)}
+                    />
+                  ))}
                 </div>
               </section>
-            )}
 
-            {/* Daily Check-in */}
-            <section>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Today's Check-in</h2>
+              {/* Stats for selected trackable */}
+              {currentTrackable && (
+                <section>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                    Stats for: {currentTrackable.name}
+                  </h2>
+                  <StreakDisplay trackable={currentTrackable} />
+                </section>
+              )}
+
+              {/* Calendar Visualization */}
+              {currentTrackable && (
+                <section>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                    Progress Calendar: {currentTrackable.name}
+                  </h2>
+                  <div className="bg-white rounded-xl shadow-sm border p-6">
+                    <ContributionCalendar trackable={currentTrackable} />
+                  </div>
+                </section>
+              )}
+            </TabsContent>
+
+            <TabsContent value="checkin">
+              <section>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Today's Check-in</h2>
+                <div className="bg-white rounded-xl shadow-sm border p-6">
+                  <DailyCheckIn trackables={trackables} />
+                </div>
+              </section>
+            </TabsContent>
+
+            <TabsContent value="manage">
               <div className="bg-white rounded-xl shadow-sm border p-6">
-                <DailyCheckIn trackables={trackables} />
+                <TrackableManagement trackables={trackables} />
               </div>
-            </section>
-          </>
+            </TabsContent>
+          </Tabs>
         )}
       </div>
     </div>
