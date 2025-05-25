@@ -4,19 +4,34 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ContributionCalendar } from './ContributionCalendar';
 import { TrackableCard } from './TrackableCard';
 import { DailyCheckIn } from './DailyCheckIn';
-import { Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-
-// Mock data for demonstration
-const mockTrackables = [
-  { id: 1, name: 'Exercise', color: '#22c55e', description: 'Daily workout routine' },
-  { id: 2, name: 'Reading', color: '#3b82f6', description: 'Read for 30 minutes' },
-  { id: 3, name: 'Meditation', color: '#8b5cf6', description: 'Mindfulness practice' },
-  { id: 4, name: 'Water Intake', color: '#06b6d4', description: '8 glasses of water' },
-];
+import { AddTrackableDialog } from './AddTrackableDialog';
+import { useTrackables } from '@/hooks/useTrackables';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function Dashboard() {
-  const [selectedTrackable, setSelectedTrackable] = useState(mockTrackables[0]);
+  const { trackables, loading } = useTrackables();
+  const { user, signOut } = useAuth();
+  const [selectedTrackable, setSelectedTrackable] = useState<string | null>(null);
+
+  // Set default selected trackable when trackables load
+  React.useEffect(() => {
+    if (trackables.length > 0 && !selectedTrackable) {
+      setSelectedTrackable(trackables[0].id);
+    }
+  }, [trackables, selectedTrackable]);
+
+  const currentTrackable = trackables.find(t => t.id === selectedTrackable);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading your trackables...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -28,45 +43,63 @@ export function Dashboard() {
             <p className="text-gray-600">Track your daily habits and progress</p>
           </div>
         </div>
-        <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Trackable
-        </Button>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-gray-600">Welcome, {user?.email}</span>
+          <AddTrackableDialog />
+          <button
+            onClick={signOut}
+            className="text-sm text-gray-500 hover:text-gray-700"
+          >
+            Sign Out
+          </button>
+        </div>
       </header>
 
       <div className="p-6 space-y-8">
-        {/* Trackables Grid */}
-        <section>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Trackables</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {mockTrackables.map((trackable) => (
-              <TrackableCard
-                key={trackable.id}
-                trackable={trackable}
-                isSelected={selectedTrackable.id === trackable.id}
-                onClick={() => setSelectedTrackable(trackable)}
-              />
-            ))}
+        {trackables.length === 0 ? (
+          <div className="text-center py-12">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">No trackables yet</h2>
+            <p className="text-gray-600 mb-6">Create your first trackable to start tracking your daily habits.</p>
+            <AddTrackableDialog />
           </div>
-        </section>
+        ) : (
+          <>
+            {/* Trackables Grid */}
+            <section>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Trackables</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {trackables.map((trackable) => (
+                  <TrackableCard
+                    key={trackable.id}
+                    trackable={trackable}
+                    isSelected={selectedTrackable === trackable.id}
+                    onClick={() => setSelectedTrackable(trackable.id)}
+                  />
+                ))}
+              </div>
+            </section>
 
-        {/* Calendar Visualization */}
-        <section>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Progress for: {selectedTrackable.name}
-          </h2>
-          <div className="bg-white rounded-xl shadow-sm border p-6">
-            <ContributionCalendar trackable={selectedTrackable} />
-          </div>
-        </section>
+            {/* Calendar Visualization */}
+            {currentTrackable && (
+              <section>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  Progress for: {currentTrackable.name}
+                </h2>
+                <div className="bg-white rounded-xl shadow-sm border p-6">
+                  <ContributionCalendar trackable={currentTrackable} />
+                </div>
+              </section>
+            )}
 
-        {/* Daily Check-in */}
-        <section>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Today's Check-in</h2>
-          <div className="bg-white rounded-xl shadow-sm border p-6">
-            <DailyCheckIn trackables={mockTrackables} />
-          </div>
-        </section>
+            {/* Daily Check-in */}
+            <section>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Today's Check-in</h2>
+              <div className="bg-white rounded-xl shadow-sm border p-6">
+                <DailyCheckIn trackables={trackables} />
+              </div>
+            </section>
+          </>
+        )}
       </div>
     </div>
   );

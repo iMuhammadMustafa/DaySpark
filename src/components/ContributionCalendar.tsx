@@ -1,52 +1,44 @@
 
 import React from 'react';
-
-interface Trackable {
-  id: number;
-  name: string;
-  color: string;
-  description: string;
-}
+import { useEntries } from '@/hooks/useEntries';
+import { Trackable } from '@/hooks/useTrackables';
 
 interface ContributionCalendarProps {
   trackable: Trackable;
 }
 
-// Generate mock data for the last 365 days
-const generateMockData = (color: string) => {
-  const data = [];
-  const today = new Date();
-  
-  for (let i = 364; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-    
-    // Random completion (0-4 levels)
-    const level = Math.random() > 0.3 ? Math.floor(Math.random() * 4) + 1 : 0;
-    
-    data.push({
-      date: date.toISOString().split('T')[0],
-      level,
-      count: level,
-    });
-  }
-  
-  return data;
-};
-
-const getIntensityColor = (level: number, baseColor: string) => {
-  const intensities = {
-    0: '#f3f4f6',
-    1: baseColor + '40',
-    2: baseColor + '60',
-    3: baseColor + '80',
-    4: baseColor,
-  };
-  return intensities[level as keyof typeof intensities] || intensities[0];
+const getIntensityColor = (hasEntry: boolean, baseColor: string) => {
+  if (!hasEntry) return '#f3f4f6';
+  return baseColor;
 };
 
 export function ContributionCalendar({ trackable }: ContributionCalendarProps) {
-  const data = generateMockData(trackable.color);
+  const { entries } = useEntries(trackable.id);
+  
+  // Generate the last 365 days
+  const generateCalendarData = () => {
+    const data = [];
+    const today = new Date();
+    
+    for (let i = 364; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateString = date.toISOString().split('T')[0];
+      
+      const hasEntry = entries.some(entry => 
+        entry.date === dateString && entry.completed
+      );
+      
+      data.push({
+        date: dateString,
+        hasEntry,
+      });
+    }
+    
+    return data;
+  };
+
+  const data = generateCalendarData();
   
   // Group data by weeks
   const weeks = [];
@@ -67,30 +59,30 @@ export function ContributionCalendar({ trackable }: ContributionCalendarProps) {
       const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
       labels.push({
         month: months[date.getMonth()],
-        position: (11 - i) * 4.3, // Approximate position
+        position: (11 - i) * 4.3,
       });
     }
     
     return labels;
   };
 
+  const completedCount = data.filter(d => d.hasEntry).length;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-600">
-            {data.filter(d => d.level > 0).length} contributions in the last year
+            {completedCount} contributions in the last year
           </span>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span>Less</span>
-          {[0, 1, 2, 3, 4].map(level => (
-            <div
-              key={level}
-              className="w-3 h-3 rounded-sm"
-              style={{ backgroundColor: getIntensityColor(level, trackable.color) }}
-            />
-          ))}
+          <div className="w-3 h-3 rounded-sm bg-gray-200" />
+          <div
+            className="w-3 h-3 rounded-sm"
+            style={{ backgroundColor: trackable.color }}
+          />
           <span>More</span>
         </div>
       </div>
@@ -127,8 +119,8 @@ export function ContributionCalendar({ trackable }: ContributionCalendarProps) {
                     <div
                       key={`${weekIndex}-${dayIndex}`}
                       className="w-3 h-3 rounded-sm cursor-pointer hover:ring-1 hover:ring-gray-400 transition-all"
-                      style={{ backgroundColor: getIntensityColor(day.level, trackable.color) }}
-                      title={`${day.date}: ${day.count} ${trackable.name.toLowerCase()}`}
+                      style={{ backgroundColor: getIntensityColor(day.hasEntry, trackable.color) }}
+                      title={`${day.date}: ${day.hasEntry ? 'Completed' : 'Not completed'} ${trackable.name.toLowerCase()}`}
                     />
                   ))}
                 </div>

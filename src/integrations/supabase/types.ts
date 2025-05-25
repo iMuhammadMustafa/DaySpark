@@ -219,6 +219,44 @@ export type Database = {
           },
         ]
       }
+      entries: {
+        Row: {
+          completed: boolean
+          created_at: string
+          date: string
+          id: string
+          notes: string | null
+          trackable_id: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          trackable_id: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          trackable_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entries_trackable_id_fkey"
+            columns: ["trackable_id"]
+            isOneToOne: false
+            referencedRelation: "trackables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -240,6 +278,39 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      trackables: {
+        Row: {
+          color: string
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
