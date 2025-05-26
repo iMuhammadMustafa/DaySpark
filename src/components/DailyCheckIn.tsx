@@ -6,6 +6,7 @@ import { Check, StickyNote } from 'lucide-react';
 import { Trackable } from '@/hooks/useTrackables';
 import { useEntries } from '@/hooks/useEntries';
 import { NotesDialog } from './NotesDialog';
+import { DateCheckInDialog } from './DateCheckInDialog';
 
 interface DailyCheckInProps {
   trackables: Trackable[];
@@ -45,7 +46,7 @@ export function DailyCheckIn({ trackables }: DailyCheckInProps) {
       }
       setCheckedItems(newCheckedItems);
     } catch (error) {
-      // Error handled in hook
+      console.error('Error updating entry:', error);
     }
   };
 
@@ -74,15 +75,18 @@ export function DailyCheckIn({ trackables }: DailyCheckInProps) {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold text-gray-900">
-          Check in for {todayFormatted}
-        </h3>
-        <p className="text-sm sm:text-base text-gray-600">Mark the activities you completed today</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-foreground">
+            Check in for {todayFormatted}
+          </h3>
+          <p className="text-sm sm:text-base text-muted-foreground">Mark the activities you completed today</p>
+        </div>
+        <DateCheckInDialog trackables={trackables} />
       </div>
 
       {trackables.length === 0 ? (
-        <p className="text-gray-500 text-center py-8 text-sm sm:text-base">
+        <p className="text-muted-foreground text-center py-8 text-sm sm:text-base">
           No trackables available. Create some trackables to start checking in!
         </p>
       ) : (
@@ -94,8 +98,8 @@ export function DailyCheckIn({ trackables }: DailyCheckInProps) {
                 key={trackable.id}
                 className={`p-3 sm:p-4 border rounded-lg transition-all duration-200 ${
                   checkedItems.has(trackable.id)
-                    ? 'border-green-300 bg-green-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-950'
+                    : 'border-border hover:border-muted-foreground'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -109,10 +113,10 @@ export function DailyCheckIn({ trackables }: DailyCheckInProps) {
                     style={{ backgroundColor: trackable.color }}
                   />
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 text-sm sm:text-base">{trackable.name}</h4>
-                    <p className="text-xs sm:text-sm text-gray-600 truncate">{trackable.description}</p>
+                    <h4 className="font-medium text-foreground text-sm sm:text-base">{trackable.name}</h4>
+                    <p className="text-xs sm:text-sm text-muted-foreground truncate">{trackable.description}</p>
                     {entry?.notes && (
-                      <p className="text-xs text-gray-500 mt-1 italic line-clamp-2">"{entry.notes}"</p>
+                      <p className="text-xs text-muted-foreground mt-1 italic line-clamp-2">"{entry.notes}"</p>
                     )}
                   </div>
                   <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">

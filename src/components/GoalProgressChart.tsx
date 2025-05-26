@@ -18,10 +18,18 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
   const { goals } = useGoals(trackable.id);
 
   if (goals.length === 0) {
-    return null;
+    return (
+      <Card className="p-4 sm:p-6">
+        <div className="text-center py-8">
+          <Target className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold text-foreground mb-2">No Goals Set</h3>
+          <p className="text-muted-foreground">Set a goal for this trackable to see progress charts.</p>
+        </div>
+      </Card>
+    );
   }
 
-  const goal = goals[0]; // Use the first goal for now
+  const goal = goals[0];
   const today = new Date();
 
   const getPeriodData = () => {
@@ -57,7 +65,6 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
 
   const { periodStart, periodEnd, periodDays } = getPeriodData();
 
-  // Get entries within the current period
   const periodEntries = entries.filter(entry => {
     const entryDate = new Date(entry.date);
     return entryDate >= periodStart && entryDate <= periodEnd && entry.completed;
@@ -66,16 +73,11 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
   const currentProgress = periodEntries.length;
   const progressPercentage = Math.round((currentProgress / goal.target_value) * 100);
 
-  // Generate chart data for the last 30 days or current period, whichever is longer
   const chartDays = Math.max(30, periodDays);
   const chartData = [];
   
   for (let i = chartDays - 1; i >= 0; i--) {
     const date = subDays(today, i);
-    const dateStr = format(date, 'yyyy-MM-dd');
-    const dayEntries = entries.filter(e => e.date === dateStr && e.completed).length;
-    
-    // Calculate cumulative progress for the current period
     let cumulativeProgress = 0;
     if (date >= periodStart) {
       cumulativeProgress = entries.filter(e => {
@@ -92,19 +94,25 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
   }
 
   const getStatusColor = () => {
-    if (progressPercentage >= 100) return 'text-green-600';
-    if (progressPercentage >= 75) return 'text-blue-600';
-    if (progressPercentage >= 50) return 'text-yellow-600';
-    return 'text-red-600';
+    if (progressPercentage >= 100) return 'text-green-600 dark:text-green-400';
+    if (progressPercentage >= 75) return 'text-blue-600 dark:text-blue-400';
+    if (progressPercentage >= 50) return 'text-yellow-600 dark:text-yellow-400';
+    return 'text-red-600 dark:text-red-400';
   };
 
   const getStatusIcon = () => {
-    if (progressPercentage >= 100) return <TrendingUp className="w-4 h-4 text-green-600" />;
-    if (progressPercentage < 50) return <AlertCircle className="w-4 h-4 text-red-600" />;
-    return <Target className="w-4 h-4 text-blue-600" />;
+    if (progressPercentage >= 100) return <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />;
+    if (progressPercentage < 50) return <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />;
+    return <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />;
   };
 
-  // Chart configuration for shadcn/ui chart
+  const getProgressBarColor = () => {
+    if (progressPercentage >= 100) return '#22c55e';
+    if (progressPercentage >= 75) return '#3b82f6';
+    if (progressPercentage >= 50) return '#f59e0b';
+    return '#ef4444';
+  };
+
   const chartConfig = {
     progress: {
       label: "Progress",
@@ -117,7 +125,7 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Target className="w-5 h-5" style={{ color: trackable.color }} />
-          <h3 className="text-lg font-semibold">Goal Progress</h3>
+          <h3 className="text-lg font-semibold text-foreground">Goal Progress</h3>
         </div>
         <div className="flex items-center gap-2">
           {getStatusIcon()}
@@ -127,16 +135,16 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
         </div>
       </div>
 
-      <div className="mb-4">
-        <p className="text-sm text-gray-600 mb-2">
+      <div className="mb-6">
+        <p className="text-sm text-muted-foreground mb-3">
           Target: {goal.target_value} times per {goal.target_period.replace('ly', '')}
         </p>
-        <div className="w-full bg-gray-200 rounded-full h-3">
+        <div className="w-full bg-muted rounded-full h-4 overflow-hidden">
           <div
-            className="h-3 rounded-full transition-all duration-300"
+            className="h-full rounded-full transition-all duration-500 ease-out"
             style={{
               width: `${Math.min(progressPercentage, 100)}%`,
-              backgroundColor: progressPercentage >= 100 ? '#22c55e' : progressPercentage >= 75 ? '#3b82f6' : progressPercentage >= 50 ? '#f59e0b' : '#ef4444'
+              backgroundColor: getProgressBarColor()
             }}
           />
         </div>
@@ -144,15 +152,19 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
 
       <div className="h-64">
         <ChartContainer config={chartConfig}>
-          <LineChart data={chartData}>
+          <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <XAxis 
               dataKey="date" 
-              tick={{ fontSize: 12 }}
+              tick={{ fontSize: 12, fill: 'currentColor' }}
               interval="preserveStartEnd"
+              axisLine={{ stroke: 'currentColor', opacity: 0.2 }}
+              tickLine={{ stroke: 'currentColor', opacity: 0.2 }}
             />
             <YAxis 
-              tick={{ fontSize: 12 }}
-              domain={[0, Math.max(goal.target_value, Math.max(...chartData.map(d => d.progress)))]}
+              tick={{ fontSize: 12, fill: 'currentColor' }}
+              domain={[0, Math.max(goal.target_value, Math.max(...chartData.map(d => d.progress)) || 0)]}
+              axisLine={{ stroke: 'currentColor', opacity: 0.2 }}
+              tickLine={{ stroke: 'currentColor', opacity: 0.2 }}
             />
             <ChartTooltip 
               content={<ChartTooltipContent />}
@@ -162,26 +174,31 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
               type="monotone"
               dataKey="progress"
               stroke={trackable.color}
-              strokeWidth={2}
-              dot={{ fill: trackable.color, strokeWidth: 2, r: 3 }}
+              strokeWidth={3}
+              dot={{ fill: trackable.color, strokeWidth: 2, r: 4 }}
+              activeDot={{ r: 6, stroke: trackable.color, strokeWidth: 2 }}
               name="Progress"
             />
             <ReferenceLine
               y={goal.target_value}
               stroke="#ef4444"
-              strokeDasharray="5 5"
+              strokeDasharray="8 4"
               strokeWidth={2}
-              label={{ value: "Goal", position: "top" }}
+              label={{ 
+                value: `Goal: ${goal.target_value}`, 
+                position: "topRight",
+                style: { fontSize: '12px', fill: 'currentColor' }
+              }}
             />
           </LineChart>
         </ChartContainer>
       </div>
 
       {progressPercentage >= 100 && (
-        <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+        <div className="mt-4 p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
           <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-green-600" />
-            <span className="text-sm font-medium text-green-800">
+            <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+            <span className="text-sm font-medium text-green-800 dark:text-green-200">
               🎉 Congratulations! You've reached your goal!
             </span>
           </div>

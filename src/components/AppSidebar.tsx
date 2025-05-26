@@ -10,61 +10,76 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Calendar, Plus, User, Check } from "lucide-react";
+import { Calendar, Plus, User, Check, BarChart3 } from "lucide-react";
 
 const navigationItems = [
   {
     title: "Dashboard",
-    url: "#",
-    icon: Calendar,
+    url: "#overview",
+    icon: BarChart3,
   },
   {
-    title: "Add Trackable",
-    url: "#",
-    icon: Plus,
-  },
-  {
-    title: "Daily Check-in",
-    url: "#",
+    title: "Check-in",
+    url: "#checkin",
     icon: Check,
   },
   {
-    title: "Profile",
-    url: "#",
+    title: "Add Trackable",
+    url: "#add",
+    icon: Plus,
+  },
+  {
+    title: "Manage",
+    url: "#manage",
     icon: User,
   },
 ];
 
 export function AppSidebar() {
+  const handleNavigation = (url: string) => {
+    if (url.startsWith('#')) {
+      const section = url.substring(1);
+      if (section === 'add') {
+        // Trigger add trackable dialog
+        const addButton = document.querySelector('[data-dialog="add-trackable"]') as HTMLElement;
+        addButton?.click();
+      } else {
+        // Switch to the appropriate tab
+        const tabTrigger = document.querySelector(`[value="${section}"]`) as HTMLElement;
+        tabTrigger?.click();
+      }
+    }
+  };
+
   return (
-    <Sidebar className="border-r bg-white">
-      <SidebarHeader className="border-b p-6">
+    <Sidebar className="border-r border-border bg-card">
+      <SidebarHeader className="border-b border-border p-6">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
             <Calendar className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-lg text-gray-900">DayTracker</h1>
-            <p className="text-sm text-gray-500">Build better habits</p>
+            <h1 className="font-bold text-lg text-foreground">DayTracker</h1>
+            <p className="text-sm text-muted-foreground">Build better habits</p>
           </div>
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
+          <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 py-2">
             Navigation
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="hover:bg-blue-50 hover:text-blue-700 transition-colors">
-                    <a href={item.url} className="flex items-center gap-3 px-3 py-2 rounded-lg">
-                      <item.icon className="w-4 h-4" />
-                      <span className="font-medium">{item.title}</span>
-                    </a>
+                  <SidebarMenuButton 
+                    className="hover:bg-accent hover:text-accent-foreground transition-colors"
+                    onClick={() => handleNavigation(item.url)}
+                  >
+                    <item.icon className="w-4 h-4" />
+                    <span className="font-medium">{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
