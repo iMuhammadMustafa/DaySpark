@@ -163,7 +163,7 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
               stroke="#ef4444"
               strokeDasharray="5 5"
               strokeWidth={2}
-              label={{ value: "Goal", position: "topRight" }}
+              label={{ value: "Goal", position: "top" }}
             />
           </LineChart>
         </ResponsiveContainer>

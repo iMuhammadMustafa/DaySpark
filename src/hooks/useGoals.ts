@@ -35,7 +35,8 @@ export function useGoals(trackableId?: string) {
       const { data, error } = await query;
 
       if (error) throw error;
-      setGoals(data || []);
+      // Type assertion to ensure the data matches our Goal interface
+      setGoals((data || []) as Goal[]);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -58,12 +59,12 @@ export function useGoals(trackableId?: string) {
         .single();
 
       if (error) throw error;
-      setGoals(prev => [data, ...prev]);
+      setGoals(prev => [data as Goal, ...prev]);
       toast({
         title: "Success",
         description: "Goal created successfully",
       });
-      return data;
+      return data as Goal;
     } catch (error: any) {
       toast({
         title: "Error",
@@ -86,12 +87,12 @@ export function useGoals(trackableId?: string) {
         .single();
 
       if (error) throw error;
-      setGoals(prev => prev.map(g => g.id === id ? data : g));
+      setGoals(prev => prev.map(g => g.id === id ? data as Goal : g));
       toast({
         title: "Success",
         description: "Goal updated successfully",
       });
-      return data;
+      return data as Goal;
     } catch (error: any) {
       toast({
         title: "Error",
