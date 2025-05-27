@@ -11,13 +11,19 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { Calendar, Plus, User, Check, BarChart3 } from "lucide-react";
+import { Calendar, Plus, User, Check, BarChart3, CalendarDays } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const navigationItems = [
   {
     title: "Dashboard",
-    url: "#overview",
+    url: "/",
     icon: BarChart3,
+  },
+  {
+    title: "Calendar View",
+    url: "/calendar",
+    icon: CalendarDays,
   },
   {
     title: "Check-in",
@@ -37,6 +43,9 @@ const navigationItems = [
 ];
 
 export function AppSidebar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const handleNavigation = (url: string) => {
     if (url.startsWith('#')) {
       const section = url.substring(1);
@@ -49,6 +58,9 @@ export function AppSidebar() {
         const tabTrigger = document.querySelector(`[value="${section}"]`) as HTMLElement;
         tabTrigger?.click();
       }
+    } else {
+      // Navigate to the page
+      navigate(url);
     }
   };
 
@@ -75,7 +87,9 @@ export function AppSidebar() {
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton 
-                    className="hover:bg-accent hover:text-accent-foreground transition-colors"
+                    className={`hover:bg-accent hover:text-accent-foreground transition-colors ${
+                      location.pathname === item.url ? 'bg-accent text-accent-foreground' : ''
+                    }`}
                     onClick={() => handleNavigation(item.url)}
                   >
                     <item.icon className="w-4 h-4" />
