@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useEntries } from '@/hooks/useEntries';
 import { Trackable } from '@/hooks/useTrackables';
 import { format, startOfYear, endOfYear, eachDayOfInterval, getDay, startOfWeek } from 'date-fns';
+import { DateCheckInDialog } from './DateCheckInDialog';
 
 interface ContributionCalendarProps {
   trackable: Trackable;
@@ -15,6 +16,8 @@ const getIntensityColor = (hasEntry: boolean, baseColor: string) => {
 
 export function ContributionCalendar({ trackable }: ContributionCalendarProps) {
   const { entries } = useEntries(trackable.id);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [showDateDialog, setShowDateDialog] = useState(false);
   
   const generateCalendarData = () => {
     const today = new Date();
@@ -93,6 +96,13 @@ export function ContributionCalendar({ trackable }: ContributionCalendarProps) {
     return labels;
   };
 
+  const handleSquareClick = (day: any) => {
+    if (day.isPadding) return;
+    
+    setSelectedDate(day.date);
+    setShowDateDialog(true);
+  };
+
   const completedCount = data.filter(d => d.hasEntry && !d.isPadding).length;
   const dayLabels = ['Mon', 'Wed', 'Fri'];
 
@@ -160,12 +170,13 @@ export function ContributionCalendar({ trackable }: ContributionCalendarProps) {
                     <div
                       key={`${weekIndex}-${dayIndex}`}
                       className={`w-3 h-3 rounded-sm transition-all hover:ring-1 hover:ring-ring ${
-                        day.isPadding ? 'opacity-0 pointer-events-none' : 'cursor-pointer'
+                        day.isPadding ? 'opacity-0 pointer-events-none' : 'cursor-pointer hover:scale-110'
                       }`}
                       style={{ 
                         backgroundColor: day.isPadding ? 'transparent' : getIntensityColor(day.hasEntry, trackable.color)
                       }}
-                      title={day.isPadding ? '' : `${day.date}: ${day.hasEntry ? 'Completed' : 'Not completed'} ${trackable.name.toLowerCase()}`}
+                      title={day.isPadding ? '' : `${day.date}: ${day.hasEntry ? 'Completed' : 'Not completed'} ${trackable.name.toLowerCase()} - Click to add entry`}
+                      onClick={() => handleSquareClick(day)}
                     />
                   ))}
                 </div>
@@ -174,6 +185,18 @@ export function ContributionCalendar({ trackable }: ContributionCalendarProps) {
           </div>
         </div>
       </div>
+
+      {showDateDialog && selectedDate && (
+        <DateCheckInDialog
+          trackable={trackable}
+          date={selectedDate}
+          isOpen={showDateDialog}
+          onClose={() => {
+            setShowDateDialog(false);
+            setSelectedDate(null);
+          }}
+        />
+      )}
     </div>
   );
 }
