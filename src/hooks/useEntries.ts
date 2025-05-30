@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDemo } from '@/contexts/DemoContext';
 import { useToast } from '@/hooks/use-toast';
 
 export interface Entry {
@@ -17,10 +17,20 @@ export function useEntries(trackableId?: string) {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { isDemoMode, demoEntries } = useDemo();
   const { toast } = useToast();
 
   const fetchEntries = async () => {
     if (!user) return;
+
+    if (isDemoMode) {
+      const filteredEntries = trackableId 
+        ? demoEntries.filter(entry => entry.trackable_id === trackableId)
+        : demoEntries;
+      setEntries(filteredEntries);
+      setLoading(false);
+      return;
+    }
 
     try {
       let query = supabase
@@ -49,6 +59,15 @@ export function useEntries(trackableId?: string) {
 
   const createEntry = async (trackableId: string, date: string, completed: boolean = true, notes?: string) => {
     if (!user) return;
+
+    if (isDemoMode) {
+      toast({
+        title: "Demo Mode",
+        description: "Cannot create entries in demo mode",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -82,6 +101,15 @@ export function useEntries(trackableId?: string) {
   const deleteEntry = async (trackableId: string, date: string) => {
     if (!user) return;
 
+    if (isDemoMode) {
+      toast({
+        title: "Demo Mode",
+        description: "Cannot delete entries in demo mode",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('entries')
@@ -103,7 +131,7 @@ export function useEntries(trackableId?: string) {
 
   useEffect(() => {
     fetchEntries();
-  }, [user, trackableId]);
+  }, [user, trackableId, isDemoMode]);
 
   return {
     entries,

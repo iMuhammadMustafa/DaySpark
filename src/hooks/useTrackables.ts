@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDemo } from '@/contexts/DemoContext';
 import { useToast } from '@/hooks/use-toast';
 
 export interface Trackable {
@@ -18,10 +18,17 @@ export function useTrackables() {
   const [trackables, setTrackables] = useState<Trackable[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { isDemoMode, demoTrackables } = useDemo();
   const { toast } = useToast();
 
   const fetchTrackables = async () => {
     if (!user) return;
+
+    if (isDemoMode) {
+      setTrackables(demoTrackables);
+      setLoading(false);
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -44,6 +51,15 @@ export function useTrackables() {
 
   const createTrackable = async (trackable: Omit<Trackable, 'id' | 'created_at' | 'updated_at'>) => {
     if (!user) return;
+
+    if (isDemoMode) {
+      toast({
+        title: "Demo Mode",
+        description: "Cannot create trackables in demo mode",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -71,6 +87,15 @@ export function useTrackables() {
 
   const updateTrackable = async (id: string, updates: Partial<Trackable>) => {
     if (!user) return;
+
+    if (isDemoMode) {
+      toast({
+        title: "Demo Mode",
+        description: "Cannot update trackables in demo mode",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -100,6 +125,15 @@ export function useTrackables() {
   const deleteTrackable = async (id: string) => {
     if (!user) return;
 
+    if (isDemoMode) {
+      toast({
+        title: "Demo Mode",
+        description: "Cannot delete trackables in demo mode",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('trackables')
@@ -124,7 +158,7 @@ export function useTrackables() {
 
   useEffect(() => {
     fetchTrackables();
-  }, [user]);
+  }, [user, isDemoMode]);
 
   return {
     trackables,

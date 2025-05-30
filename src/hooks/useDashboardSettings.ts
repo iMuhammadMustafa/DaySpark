@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDemo } from '@/contexts/DemoContext';
 import { useToast } from '@/hooks/use-toast';
 
 export interface DashboardSettings {
@@ -17,10 +17,17 @@ export function useDashboardSettings() {
   const [settings, setSettings] = useState<DashboardSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { isDemoMode, demoSettings } = useDemo();
   const { toast } = useToast();
 
   const fetchSettings = async () => {
     if (!user) return;
+
+    if (isDemoMode) {
+      setSettings(demoSettings);
+      setLoading(false);
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -44,6 +51,15 @@ export function useDashboardSettings() {
 
   const updateSettings = async (selectedTrackables: string[], trackableOrder: string[]) => {
     if (!user) return;
+
+    if (isDemoMode) {
+      toast({
+        title: "Demo Mode",
+        description: "Cannot update settings in demo mode",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -77,6 +93,15 @@ export function useDashboardSettings() {
   const resetToDefault = async (allTrackableIds: string[]) => {
     if (!user) return;
 
+    if (isDemoMode) {
+      toast({
+        title: "Demo Mode",
+        description: "Cannot reset settings in demo mode",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('dashboard_settings')
@@ -108,7 +133,7 @@ export function useDashboardSettings() {
 
   useEffect(() => {
     fetchSettings();
-  }, [user]);
+  }, [user, isDemoMode]);
 
   return {
     settings,
