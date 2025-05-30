@@ -221,3 +221,5 @@ export function StreakDisplay({ trackable }: StreakDisplayProps) {
     </div>
   );
 }
+
+

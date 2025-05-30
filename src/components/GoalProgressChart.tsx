@@ -274,3 +274,5 @@ export function GoalProgressChart({ trackable }: GoalProgressChartProps) {
     </Card>
   );
 }
+
+

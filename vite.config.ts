@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 ***REMOVED***act from "@vitejs/plugin-react-swc";
 import path from "path";
-import { componentTagger } from "lovable-tagger";
+import { componentTagger } from "iMuhammadMustafa-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -20,3 +20,5 @@ export default defineConfig(({ mode }) => ({
     },
   },
 }));
+
+

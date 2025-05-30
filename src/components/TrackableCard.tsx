@@ -67,3 +67,5 @@ export function TrackableCard({ trackable, isSelected, onClick }: TrackableCardP
     </Card>
   );
 }
+
+

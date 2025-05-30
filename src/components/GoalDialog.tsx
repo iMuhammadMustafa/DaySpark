@@ -111,3 +111,5 @@ export function GoalDialog({ trackable, goal, children }: GoalDialogProps) {
     </Dialog>
   );
 }
+
+

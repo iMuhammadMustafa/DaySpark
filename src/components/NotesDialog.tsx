@@ -66,3 +66,5 @@ export function NotesDialog({ isOpen, onClose, trackableId, trackableName, date 
     </Dialog>
   );
 }
+
+

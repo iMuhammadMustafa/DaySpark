@@ -199,3 +199,5 @@ export function ContributionCalendar({ trackable }: ContributionCalendarProps) {
     </div>
   );
 }
+
+
