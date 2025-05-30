@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ContributionCalendar } from './ContributionCalendar';
@@ -12,13 +11,16 @@ import { GoalProgressChart } from './GoalProgressChart';
 import { ThemeToggle } from './ThemeToggle';
 import { useTrackables } from '@/hooks/useTrackables';
 import { useDashboardSettings } from '@/hooks/useDashboardSettings';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { WifiOff } from 'lucide-react';
 
 export function Dashboard() {
   const { trackables, loading } = useTrackables();
   const { settings, loading: settingsLoading } = useDashboardSettings();
   const { user } = useAuth();
+  const isOnline = useOnlineStatus();
   const [selectedTrackable, setSelectedTrackable] = useState<string | null>(null);
   const [customSelectedTrackables, setCustomSelectedTrackables] = useState<string[]>([]);
   const [customTrackableOrder, setCustomTrackableOrder] = useState<string[]>([]);
@@ -98,6 +100,12 @@ export function Dashboard() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {!isOnline && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted px-2 py-1 rounded">
+              <WifiOff className="w-4 h-4" />
+              <span className="hidden sm:inline">Offline</span>
+            </div>
+          )}
           <ThemeToggle />
           <AddTrackableDialog />
         </div>
