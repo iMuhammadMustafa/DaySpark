@@ -22,8 +22,6 @@ DayTracker is a comprehensive Progressive Web Application (PWA) designed to help
 
 ### Screenshots
 
-<!-- Add screenshots here -->
-
 - **Dashboard Overview:** ![Dashboard](./screenshots/dashboard.png)
 - **Calendar View:** ![Calendar](./screenshots/calendar.png)
 - **Goal Progress:** ![Goals](./screenshots/goals.png)
